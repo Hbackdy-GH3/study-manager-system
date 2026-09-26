@@ -1,0 +1,160 @@
+#include "topic.h"
+
+void pop(){
+    int choice;
+    printf("AT WHICH NODE , DO YOU WANT TO DELETE ?");
+    printf("1. FRONT?");
+    printf("2. BACK?");
+    printf("3. ANWHERE IN BETWEEN?");
+    while (1){
+        printf("Enter your choice: ");
+        scanf("%d",&choice);
+        switch (choice){
+            case 1:
+                popfront();
+                break;
+            case 2: 
+                popback();
+                break;
+            case 3:
+                if(head==NULL){
+                    printf("File is empty.\n");
+                    return;
+                }
+                else if(head==tail){
+                    printf("There is only one topic\n");
+                    popfront();
+                    return;
+                }
+                popany();
+                break;
+            default:
+                printf("Invalid choice. Enter 1 or 2 or 3: ");
+                break;
+        }
+        if(choice==1 || choice==2 || choice==3 ){
+            break;
+        }
+    }
+
+}
+
+
+void popfront(){
+    if(head==NULL){
+        printf("File is empty.");
+        return;
+    }
+    print_topic(head);
+    printf("\n do you want to delete the topic?\n1.Yes\n2.No\n");
+    int ans;
+
+    while (1) {
+        scanf("%d", &ans);
+        switch (ans){
+            case 1:{
+                Topic* temp=head;
+                if(head==tail){
+                    free(temp);
+                    head=NULL;
+                    tail=NULL;
+                    return;
+                }
+                head=head->next;
+                head->prev=NULL;
+                free(temp);
+                printf("Deleted!\n");
+                break;
+            }
+            
+            case 2:
+                printf("Topic remains same.\n");
+                break;
+            
+            default:
+                printf("Invalid choice. Enter 1 or 2: ");
+        }
+        if(ans==1 || ans==2){
+            break;
+        }
+    }
+}
+
+void popback(){
+    if(head==NULL){
+        printf("File is empty.");
+        return;
+    }
+    print_topic(tail);
+    printf("\n do you want to delete the topic?\n1.Yes\n2.No\n");
+    int ans;
+
+    while (1) {
+        scanf("%d", &ans);
+        switch (ans){
+            case 1:{
+                
+                Topic* temp=tail;
+                if(head==tail){
+                    free(temp);
+                    head=NULL;
+                    tail=NULL;
+                    return;
+                }
+                tail=tail->prev;
+                tail->next=NULL;
+                free(temp);
+                printf("Deleted!\n");
+                break;
+            }
+            
+            case 2:
+                printf("Topic remains same.\n");
+                break;
+            
+            default:
+                printf("Invalid choice. Enter 1 or 2: ");
+        }
+        if(ans==1 || ans==2){
+            break;
+        }
+    }
+}
+
+void popany(){
+    Topic* temp=head;
+    int n=1, choice;
+    while(temp!=NULL){
+        // printf("%d. %c and %c\n",n, temp->subject,temp->chapter);
+        printf("%d. ",n),print_topic(temp);
+        temp=temp->next;
+        n++;
+    }
+    temp=head;
+    printf("Enter you choice: ");
+    scanf("%d",&choice);
+    if(choice==1){
+        popfront();
+        return;
+    }
+    else if(choice==n-1){
+        popback();
+        return;
+    }
+    else if(choice<n-1 && choice>1){
+        n=1;
+        while(n<choice){
+        temp=temp->next;
+        n++;
+    }
+        Topic* save=temp->next;
+        temp->prev->next=save;
+        save->prev=temp->prev;
+        free(temp);
+        printf("Deleted!\n");
+    }
+    else {
+        printf("Enter valid number...");
+    }
+
+}

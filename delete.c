@@ -17,17 +17,43 @@ void pop(){
                 popback();
                 break;
             case 3:
-                if(head==NULL){
-                    printf("File is empty.\n");
-                    return;
-                }
-                else if(head==tail){
-                    printf("There is only one topic\n");
-                    popfront();
-                    return;
-                }
-                popany();
+                // if(head==NULL){
+                //     printf("File is empty.\n");
+                //     return;
+                // }
+                // else if(head==tail){
+                //     printf("There is only one topic\n");
+                //     popfront();
+                //     return;
+                // }
+                // Topic* temp=head;
+                // int n=1, choice;
+                // while(temp!=NULL){
+                //     printf("%d. ",n),print_topic(temp);
+                //     temp=temp->next;
+                //     n++;
+                // }
+                // temp=head;
+                // printf("Enter you choice: ");
+                // scanf("%d",&choice);
+                // if(choice==1){
+                //     popfront();
+                //     return;
+                // }
+                // else if(choice==n-1){
+                //     popback();
+                //     return;
+                // }
+                // else if(choice<n-1 && choice>1){
+                //     n=1;
+                //     while(n<choice){
+                //     temp=temp->next;
+                //     n++;
+                // }
+                search_topic();
+                // popany(temp);
                 break;
+
             default:
                 printf("Invalid choice. Enter 1 or 2 or 3: ");
                 break;
@@ -36,9 +62,7 @@ void pop(){
             break;
         }
     }
-
 }
-
 
 void popfront(){
     if(head==NULL){
@@ -121,40 +145,33 @@ void popback(){
     }
 }
 
-void popany(){
-    Topic* temp=head;
-    int n=1, choice;
-    while(temp!=NULL){
-        // printf("%d. %c and %c\n",n, temp->subject,temp->chapter);
-        printf("%d. ",n),print_topic(temp);
-        temp=temp->next;
-        n++;
-    }
-    temp=head;
-    printf("Enter you choice: ");
-    scanf("%d",&choice);
-    if(choice==1){
+void popany(Topic* node){
+    if(node->prev==NULL){
         popfront();
         return;
     }
-    else if(choice==n-1){
+    else if(node->next==NULL){
         popback();
         return;
     }
-    else if(choice<n-1 && choice>1){
-        n=1;
-        while(n<choice){
-        temp=temp->next;
-        n++;
-    }
-        Topic* save=temp->next;
-        temp->prev->next=save;
-        save->prev=temp->prev;
-        free(temp);
-        printf("Deleted!\n");
-    }
-    else {
-        printf("Enter valid number...");
-    }
+    Topic* save=node->next;
+    save->prev=node->prev;
+    node->prev->next=save;
+    free(node);
+    printf("Deleted!\n");
+}
 
+void remove_node(Topic* node){
+    if(node->prev != NULL)
+        node->prev->next = node->next;
+    else
+        head = node->next;
+
+    if(node->next != NULL)
+        node->next->prev = node->prev;
+    else
+        tail = node->prev;
+
+    node->next = NULL;
+    node->prev = NULL;
 }

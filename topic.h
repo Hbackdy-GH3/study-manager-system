@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 
 typedef struct Topic{
@@ -21,11 +22,18 @@ void insert_prior(char subject[], char chapter[], int priority, int is_done);
 void insertfront(Topic* node);
 void insertback(Topic* node);
 void insert_any(Topic* node, Topic* temp);
+void insert_node_by_priority(Topic* node);
 
 void pop();
 void popfront();
 void popback();
-void popany();
+void popany(Topic* node);
+void remove_node(Topic* node);
+
+void search_topic();
+void searched_action(Topic* node);
+void update_priority(Topic* node);
+void update_status(Topic* node);
 
 void print_topic(Topic* node);
 void print_all();

@@ -67,25 +67,31 @@ void insert_any(Topic* node, Topic* temp){
     }else{
         save->next=node;
     }
+    print_topic(node);
 
 }
 
-void insert_prior(char subject[], char chapter[], int priority, int is_done){
-    Topic* temp=head;
-    Topic* newNode=insert_init(subject,chapter,priority,is_done);
-    if(head==NULL){
-        insertfront(newNode);
-        return;
-    }
-    while(temp!=NULL && priority<=temp->priority){
-        temp=temp->next;
-    }
-    if(temp==NULL){
-        insertback(newNode);
-        return;
-    }
-    insert_any(newNode, temp);
-    print_topic(newNode);
+void insert_node_by_priority(Topic* node){
+    Topic* temp = head;
 
+    if(head == NULL){
+        insertfront(node);
+        return;
+    }
+
+    while(temp != NULL && node->priority <= temp->priority){
+        temp = temp->next;
+    }
+
+    if(temp == NULL){
+        insertback(node);
+    } else {
+        insert_any(node, temp);
+    }
+}
+
+void insert_prior(char subject[], char chapter[], int priority, int is_done){
+    Topic* newNode=insert_init(subject,chapter,priority,is_done);
+    insert_node_by_priority(newNode);
 
 }

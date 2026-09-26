@@ -6,7 +6,9 @@ A console-based study topic manager written in C, built around a **doubly linked
 
 - **Add topics** — front, back, or automatically by priority
 - **Priority-sorted insertion** — new topics are automatically placed in the correct position so the list stays ordered from highest to lowest priority, without the user choosing where
-- **Delete topics** — from the front, the back, or any position in the middle, with confirmation prompts
+- **Search topics** — case-insensitive lookup by subject and chapter, returning a pointer to the matching node for reuse by other features
+- **Update topics** — change a topic's priority or completion status after finding it via search; a priority change automatically **re-sorts the list** by detaching and reinserting the same node (no memory reallocated, no data duplicated)
+- **Delete topics** — from the front, the back, any position in the middle, or directly from a search result — with confirmation prompts
 - **Display all topics** — formatted, readable output showing subject, chapter, priority, and completion status
 - **Single-user, in-memory** — all data lives in the linked list during runtime (persistence via file save/load is a planned addition)
 
@@ -18,8 +20,11 @@ The project is split into focused files, each with a single responsibility:
 StudyManager/
 ├── topic.h       # struct Topic definition, extern head/tail, all function prototypes
 ├── globals.c      # actual definitions of head and tail
-├── insert.c       # insert_init, insertfront, insertback, insert_any, insert_prior
+├── insert.c       # insert_init, insertfront, insertback, insert_any,
+│                   # insert_node_by_priority, insert_prior, remove_node
 ├── delete.c       # pop, popfront, popback, popany
+├── search.c       # case-insensitive search (CI), search_topic, searched_action
+├── update.c       # update_priority (with re-sort), update_status
 ├── display.c      # print_topic, print_all
 └── main.c         # program entry point
 ```
@@ -50,6 +55,16 @@ This is the core piece of logic in the project — it takes a new topic and find
 3. If the walk reaches the end (`NULL`), append at the back.
 4. Otherwise, insert the new node **before** the node where the walk stopped, using `insert_any()` — which rewires four pointers (`node`, `temp`, and their neighbors) and correctly updates `head` if the insertion happens at the very front.
 
+## Key function: `update_priority()` — reposition without reallocating
+
+Changing a topic's priority needs the list to stay sorted, but naively removing and re-`malloc`ing a new node would leak the old one and waste an allocation for data that hasn't actually changed. Instead:
+
+1. `remove_node()` detaches the existing node from the list (handles head, tail, and middle cases) — the node itself is **not** freed, since it's about to be reinserted.
+2. The node's `priority` field is updated in place.
+3. `insert_node_by_priority()` — a helper shared with `insert_prior()` — walks the list and reinserts the *same* node at its new correct position.
+
+This keeps exactly one allocation per topic for its entire lifetime, whether it's newly created or repeatedly re-prioritized.
+
 ## Build & Run
 
 **Compile all source files together:**
@@ -65,11 +80,16 @@ gcc *.c -o study_manager
 
 ## Usage
 
-The current `main.c` runs a scripted demonstration exercising every operation — priority inserts, direct front/back inserts, full-list display, and all three deletion modes. A menu-driven interface (`switch`-based, similar to the existing `pop()` menu) is the next planned addition so the program can be used interactively.
+The current `main.c` runs a scripted demonstration exercising every operation — priority inserts, direct front/back inserts, search, update, full-list display, and all deletion modes (front/back/middle/via-search). A menu-driven interface (`switch`-based, similar to the existing `pop()` menu) is the next planned addition so the program can be used interactively.
+
+Searching a topic (`search_topic()`) opens an action menu (`searched_action()`) letting the user view details, update priority, update status, delete the topic, or cancel — all operating on the same node found by the search, without re-traversing the list.
 
 ## Roadmap
 
-- [ ] Interactive master menu for insert/delete/display (switch-based)
+- [x] Search by subject/chapter (case-insensitive)
+- [x] Update priority (auto re-sorts the list) and status
+- [ ] Filters — show pending/completed topics, or filter by priority
+- [ ] Interactive master menu for insert/delete/search/display (switch-based)
 - [ ] File-based persistence (save/load topic list on exit/startup)
 - [ ] Subtopic support via a `child` pointer (tree-like structure for topics with subtopics)
 - [ ] Study session queue separate from the master topic list

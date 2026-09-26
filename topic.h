@@ -35,5 +35,7 @@ void searched_action(Topic* node);
 void update_priority(Topic* node);
 void update_status(Topic* node);
 
+void filter_via();
+
 void print_topic(Topic* node);
 void print_all();

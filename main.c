@@ -1,30 +1,101 @@
 #include "topic.h"
 
 int main() {
-    printf("########## SETUP ##########\n");
-    insert_prior("Physics", "Optics", 0, 0);
-    insert_prior("Maths", "Calculus", 1, 0);
-    insert_prior("Chemistry", "Bonding", -1, 0);
-    insert_prior("Biology", "Genetics", 0, 0);
+    int choice;
+    char subject[50], chapter[50];
+    int priority, is_done;
 
-    printf("\n########## INITIAL LIST (High -> Low expected) ##########\n");
-    print_all();
+    while(1) {
+        printf("\n========================================\n");
+        printf("      STUDY MANAGEMENT SYSTEM\n");
+        printf("========================================\n");
+        printf("1. Add Topic\n");
+        printf("2. Search / Update / Delete a Topic\n");
+        printf("3. Delete Topic (front/back/anywhere)\n");
+        printf("4. Display All Topics\n");
+        printf("5. Filter Topics\n");
+        printf("6. Exit\n");
+        printf("========================================\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
 
-    printf("\n########## Updating Chemistry's priority from Low to High ##########\n");
-    // search_topic() input: subject "Chemistry", chapter "Bonding"
-    // then choice 2 (update priority), then enter 1 (High)
-    search_topic();
+        switch(choice) {
+            case 1: {
+                int add_choice;
+                printf("\n--- Add Topic ---\n");
+                printf("1. Add at Front\n");
+                printf("2. Add at Back\n");
+                printf("3. Add by Priority (recommended)\n");
+                printf("Enter your choice: ");
+                scanf("%d", &add_choice);
 
-    printf("\n########## LIST AFTER UPDATE (Chemistry should now be near the TOP) ##########\n");
-    print_all();
+                printf("Enter subject: ");
+                scanf("%s", subject);
+                printf("Enter chapter: ");
+                scanf("%s", chapter);
+                printf("Enter priority (1=High, 0=Medium, -1=Low): ");
+                scanf("%d", &priority);
 
-    printf("\n########## Updating Maths's priority from High to Low ##########\n");
-    // search_topic() input: subject "Maths", chapter "Calculus"
-    // then choice 2 (update priority), then enter -1 (Low)
-    search_topic();
+                switch(add_choice) {
+                    case 1: {
+                        Topic* node = insert_init(subject, chapter, priority, 0);
+                        if(node != NULL) insertfront(node);
+                        break;
+                    }
+                    case 2: {
+                        Topic* node = insert_init(subject, chapter, priority, 0);
+                        if(node != NULL) insertback(node);
+                        break;
+                    }
+                    case 3:
+                        insert_prior(subject, chapter, priority, 0);
+                        break;
+                    default:
+                        printf("Invalid choice, nothing added.\n");
+                }
+                break;
+            }
 
-    printf("\n########## LIST AFTER UPDATE (Maths should now be near the BOTTOM) ##########\n");
-    print_all();
+            case 2:
+                if(head == NULL) {
+                    printf("List is empty. Nothing to search.\n");
+                } else {
+                    search_topic();
+                }
+                break;
+
+            case 3:
+                if(head == NULL) {
+                    printf("List is empty. Nothing to delete.\n");
+                } else {
+                    pop();
+                }
+                break;
+
+            case 4:
+                if(head == NULL) {
+                    printf("List is empty.\n");
+                } else {
+                    print_all();
+                }
+                break;
+
+            case 5:
+                if(head == NULL) {
+                    printf("List is empty. Nothing to filter.\n");
+                } else {
+                    filter_via();
+                }
+                break;
+
+            case 6:
+                printf("Exiting Study Management System. Goodbye!\n");
+                return 0;
+
+            default:
+                printf("Invalid choice. Please enter 1 to 6.\n");
+        }
+    }
 
     return 0;
 }

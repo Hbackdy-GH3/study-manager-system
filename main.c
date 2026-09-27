@@ -1,22 +1,28 @@
 #include "topic.h"
 
+void print_menu(){
+    printf("\n========================================\n");
+    printf("      STUDY MANAGEMENT SYSTEM\n");
+    printf("========================================\n");
+    printf("1. Add Topic\n");
+    printf("2. Search / Update / Delete a Topic\n");
+    printf("3. Delete Topic (front/back/anywhere)\n");
+    printf("4. Display All Topics\n");
+    printf("5. Filter Topics\n");
+    printf("6. Save & Exit\n");
+    printf("========================================\n");
+    printf("Enter your choice: ");
+}
+
 int main() {
+    load_data();   // program start hote hi purana saved data wapas le aao
+
     int choice;
     char subject[50], chapter[50];
-    int priority, is_done;
+    int priority;
 
     while(1) {
-        printf("\n========================================\n");
-        printf("      STUDY MANAGEMENT SYSTEM\n");
-        printf("========================================\n");
-        printf("1. Add Topic\n");
-        printf("2. Search / Update / Delete a Topic\n");
-        printf("3. Delete Topic (front/back/anywhere)\n");
-        printf("4. Display All Topics\n");
-        printf("5. Filter Topics\n");
-        printf("6. Exit\n");
-        printf("========================================\n");
-        printf("Enter your choice: ");
+        print_menu();
         scanf("%d", &choice);
 
         switch(choice) {
@@ -30,9 +36,9 @@ int main() {
                 scanf("%d", &add_choice);
 
                 printf("Enter subject: ");
-                scanf("%s", subject);
+                scanf(" %49[^\n]", subject);
                 printf("Enter chapter: ");
-                scanf("%s", chapter);
+                scanf(" %49[^\n]", chapter);
                 printf("Enter priority (1=High, 0=Medium, -1=Low): ");
                 scanf("%d", &priority);
 
@@ -57,7 +63,7 @@ int main() {
             }
 
             case 2:
-                if(head == NULL) {
+                if(head == NULL){
                     printf("List is empty. Nothing to search.\n");
                 } else {
                     search_topic();
@@ -65,7 +71,7 @@ int main() {
                 break;
 
             case 3:
-                if(head == NULL) {
+                if(head == NULL){
                     printf("List is empty. Nothing to delete.\n");
                 } else {
                     pop();
@@ -73,7 +79,7 @@ int main() {
                 break;
 
             case 4:
-                if(head == NULL) {
+                if(head == NULL){
                     printf("List is empty.\n");
                 } else {
                     print_all();
@@ -81,7 +87,7 @@ int main() {
                 break;
 
             case 5:
-                if(head == NULL) {
+                if(head == NULL){
                     printf("List is empty. Nothing to filter.\n");
                 } else {
                     filter_via();
@@ -89,7 +95,8 @@ int main() {
                 break;
 
             case 6:
-                printf("Exiting Study Management System. Goodbye!\n");
+                save_data();
+                printf("Data saved. Exiting Study Management System. Goodbye!\n");
                 return 0;
 
             default:

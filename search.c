@@ -51,10 +51,10 @@ void searched_action(Topic* node){
 void search_topic(){
     char sub[50];
     char ch[50];
-    printf("Enter you subject: \n");
-    scanf("%s",sub);
-    printf("Enter you chapter: \n");
-    scanf("%s",ch);
+    printf("Enter subject: ");
+    scanf(" %49[^\n]", sub);
+    printf("Enter chapter: ");
+    scanf(" %49[^\n]", ch);
 
     Topic* temp=head;
     while(temp!=NULL){

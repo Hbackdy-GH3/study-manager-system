@@ -31,6 +31,7 @@ void insertfront(Topic* node){
         }
         
         print_topic(node);
+        save_data();
     }
 
 }
@@ -53,6 +54,7 @@ void insertback(Topic* node){
         }
         
         print_topic(node);
+        save_data();
     }
 }
 
@@ -68,6 +70,7 @@ void insert_any(Topic* node, Topic* temp){
         save->next=node;
     }
     print_topic(node);
+    save_data();
 
 }
 

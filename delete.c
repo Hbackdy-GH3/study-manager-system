@@ -56,7 +56,7 @@ void pop(){
 
             default:
                 printf("Invalid choice. Enter 1 or 2 or 3: ");
-                break;
+                continue;
         }
         if(choice==1 || choice==2 || choice==3 ){
             break;
@@ -82,12 +82,14 @@ void popfront(){
                     free(temp);
                     head=NULL;
                     tail=NULL;
+                    save_data();
                     return;
                 }
                 head=head->next;
                 head->prev=NULL;
                 free(temp);
                 printf("Deleted!\n");
+                save_data();
                 break;
             }
             
@@ -123,12 +125,14 @@ void popback(){
                     free(temp);
                     head=NULL;
                     tail=NULL;
+                    save_data();
                     return;
                 }
                 tail=tail->prev;
                 tail->next=NULL;
                 free(temp);
                 printf("Deleted!\n");
+                save_data();
                 break;
             }
             
@@ -159,6 +163,7 @@ void popany(Topic* node){
     node->prev->next=save;
     free(node);
     printf("Deleted!\n");
+    save_data();
 }
 
 void remove_node(Topic* node){

@@ -37,5 +37,8 @@ void update_status(Topic* node);
 
 void filter_via();
 
+void save_data();
+void load_data();
+
 void print_topic(Topic* node);
 void print_all();

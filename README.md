@@ -1,36 +1,47 @@
 # Study Management System
 
-A console-based study topic manager written in C, built around a **doubly linked list** with **priority-based sorted insertion**, search, filters, and file persistence. Created as a learning project to practice core data structure operations beyond textbook basics.
+A console-based study topic manager written in C, built around a **doubly linked list** with **priority-based sorted insertion**, search, filters, a separate study-session priority queue, and file persistence. Created as a learning project to practice core data structure operations beyond textbook basics.
 
 ## Features
 
-- **Add topics** — front, back, or automatically by priority
-- **Priority-sorted insertion** — new topics are automatically placed in the correct position
-- **Search topics** — case-insensitive lookup by subject and chapter (supports multi-word input)
-- **Update topics** — change priority (auto re-sorts the list) or completion status after finding a topic via search
-- **Delete topics** — front, back, anywhere in the middle, or directly from a search result
-- **Filter topics** — view pending only, completed only, or by specific priority (High/Medium/Low)
-- **Interactive menu** — full CLI menu connecting every feature
-- **File persistence** — data is automatically saved to `data.txt` on every insert, update, and delete, and loaded back on startup
+**Master Topic List (Doubly Linked List)**
+- Add topics — front, back, or automatically by priority
+- Priority-sorted insertion — new topics are placed in the correct position automatically
+- Search topics — case-insensitive lookup by subject and chapter (supports multi-word input)
+- Update topics — change priority (auto re-sorts the list) or completion status
+- Delete topics — front, back, anywhere in the middle, or directly from a search result
+- Filter topics — pending only, completed only, or by specific priority
+- Progress summary — total, completed, pending counts and completion percentage
+
+**Today's Study Queue (separate Priority Queue, independent of the master list)**
+- Enqueue — filter the master list by status + priority, then pull N matching topics into today's queue (nodes reference the original master-list topics, not copies)
+- Dequeue — pop the next topic to study from the front of the queue
+- Display — view everything currently queued for today
+- Task count — see how many topics remain in today's queue
+
+**Persistence**
+- The master list is automatically saved to `data.txt` after every insert, update, and delete, and reloaded on startup. The study queue is intentionally session-only and is not persisted.
 
 ## Architecture
 
 ```
 StudyManager/
-├── topic.h          # struct Topic, extern head/tail, all function prototypes
-├── globals.c         # actual definitions of head and tail
-├── insert.c          # insert_init, insertfront, insertback, insert_any,
-│                      # insert_node_by_priority, insert_prior, remove_node
-├── delete.c          # pop, popfront, popback, popany
-├── search.c           # case-insensitive search (CI), search_topic, searched_action
-├── update.c           # update_priority (with re-sort), update_status
-├── filters.c          # filter_via — pending/completed/priority filters
-├── filehandling.c      # save_data, load_data
-├── display.c           # print_topic, print_all
-└── main.c              # interactive menu, program entry point
+├── topic.h            # Topic & QueueNode structs, extern head/tail/front/back, all prototypes
+├── globals.c           # actual definitions of head, tail, front, back
+├── insert.c            # insert_init, insertfront, insertback, insert_any,
+│                        # insert_node_by_priority, insert_prior, remove_node
+├── delete.c            # pop, popfront, popback, popany
+├── search.c             # case-insensitive search (CI), search_topic, searched_action
+├── update.c             # update_priority (with re-sort), update_status
+├── filters.c            # filter_via — pending/completed/priority filters
+├── progress.c            # show_progress, show_progress_queue
+├── queue.c               # filter (for enqueue), enqueue, dequeue, display_queue
+├── file_handling.c        # save_data, load_data
+├── display.c              # print_topic, print_all
+└── main.c                 # interactive menu, program entry point
 ```
 
-## Data structure
+## Data structures
 
 ```c
 typedef struct Topic {
@@ -41,19 +52,26 @@ typedef struct Topic {
     struct Topic *next;
     struct Topic *prev;
 } Topic;
+
+typedef struct QueueNode {
+    Topic* topic;             // pointer into the master list — no data duplication
+    struct QueueNode *next;
+} QueueNode;
 ```
 
-A **doubly linked list** was used so deletion and reinsertion (for priority updates) can be done in O(1) once the position is found, without tracking a separate "previous" pointer during traversal.
+The master list is a **doubly linked list** so deletion and reinsertion (for priority updates) can be done in O(1) once the position is found. The study queue is a simpler **singly linked list** with front/back pointers, since it only needs enqueue/dequeue, not arbitrary deletion.
 
 ## Key design decisions
 
-**Priority-sorted insertion (`insert_prior`)** — walks the list comparing priorities and inserts the new node in the correct position automatically, rather than requiring the user to choose front/back.
+**Priority-sorted insertion** — `insert_prior()` walks the master list and inserts new topics in the correct position automatically.
 
-**Reposition without reallocating (`update_priority`)** — when a topic's priority changes, the existing node is detached with `remove_node()` (not freed) and reinserted via `insert_node_by_priority()`. This avoids a memory leak and an unnecessary `malloc`, keeping exactly one allocation per topic for its lifetime.
+**Reposition without reallocating** — `update_priority()` detaches the existing node with `remove_node()` (not freed) and reinserts it via `insert_node_by_priority()`, avoiding a memory leak and an unnecessary allocation.
 
-**Multi-word input handling** — subject and chapter fields accept spaces (e.g. "Fourier series") using `scanf(" %49[^\n]", ...)` instead of `%s`, which stops at the first space.
+**Study queue references, not copies** — `QueueNode` stores a `Topic*` pointing back into the master list, so the queue always reflects the latest data without duplicating it.
 
-**File persistence** — the list is saved to `data.txt` as comma-separated lines after every structural change (insert/update/delete), and reloaded automatically when the program starts, so data survives between runs.
+**Filtered enqueue** — `enqueue()` uses a query-like `filter()` helper (status + priority) to pull a chosen number of matching topics into today's queue, similar to a database `WHERE` clause.
+
+**Multi-word input handling** — subject and chapter fields accept spaces using `scanf(" %49[^\n]", ...)` instead of `%s`.
 
 ## Build & Run
 
@@ -63,31 +81,36 @@ gcc *.c -o study_manager
 .\study_manager.exe    # Windows PowerShell
 ```
 
-## Usage
-
-Running the program loads any previously saved topics, then presents a menu:
+## Menu
 
 ```
+--- Master Topic List ---
 1. Add Topic
 2. Search / Update / Delete a Topic
 3. Delete Topic (front/back/anywhere)
 4. Display All Topics
 5. Filter Topics
-6. Save & Exit
+--- Today's Study Queue ---
+6. Add Topics to Today's Queue
+7. Show Today's Queue
+8. Study Next Topic (Dequeue)
+--- Progress ---
+9. Show Progress (Master List)
+10. Show Progress (Today's Queue)
+--- Program ---
+11. Save & Exit
 ```
 
-Searching a topic opens an action menu to view details, update priority/status, delete it, or cancel — all operating on the node found by the search.
+Run through every option at least once to sanity-check the full system: add a few topics, search/update/delete one, filter, enqueue a batch by status+priority, display and dequeue the queue, check both progress views, then save & exit and relaunch to confirm the master list persisted (the queue should reset, by design).
 
 ## Roadmap
 
-- [x] Search by subject/chapter (case-insensitive, multi-word)
-- [x] Update priority (auto re-sorts the list) and status
-- [x] Filters (pending/completed/priority)
+- [x] Search, update (with auto re-sort), filters
 - [x] Interactive master menu
-- [x] File-based persistence (save/load)
-- [ ] Separate study-session Priority Queue (distinct from the master topic list)
+- [x] File-based persistence
+- [x] Separate study-session priority queue (enqueue/dequeue/display)
+- [x] Progress statistics (master list and queue)
 - [ ] Subtopic support via a `child` pointer
-- [ ] Progress statistics (percentage complete, pending count)
 - [ ] WebAssembly build for a browser-based frontend
 
 ## Tech

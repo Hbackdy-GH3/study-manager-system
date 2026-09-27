@@ -4,12 +4,21 @@ void print_menu(){
     printf("\n========================================\n");
     printf("      STUDY MANAGEMENT SYSTEM\n");
     printf("========================================\n");
+    printf("--- Master Topic List ---\n");
     printf("1. Add Topic\n");
     printf("2. Search / Update / Delete a Topic\n");
     printf("3. Delete Topic (front/back/anywhere)\n");
     printf("4. Display All Topics\n");
     printf("5. Filter Topics\n");
-    printf("6. Save & Exit\n");
+    printf("--- Today's Study Queue ---\n");
+    printf("6. Add Topics to Today's Queue\n");
+    printf("7. Show Today's Queue\n");
+    printf("8. Study Next Topic (Dequeue)\n");
+    printf("--- Progress ---\n");
+    printf("9. Show Progress (Master List)\n");
+    printf("10. Show Progress (Today's Queue)\n");
+    printf("--- Program ---\n");
+    printf("11. Save & Exit\n");
     printf("========================================\n");
     printf("Enter your choice: ");
 }
@@ -95,12 +104,36 @@ int main() {
                 break;
 
             case 6:
+                if(head == NULL){
+                    printf("Master list is empty, nothing to add to queue.\n");
+                } else {
+                    enqueue();
+                }
+                break;
+
+            case 7:
+                display_queue();
+                break;
+
+            case 8:
+                dequeue();
+                break;
+
+            case 9:
+                show_progress();
+                break;
+
+            case 10:
+                show_progress_queue();
+                break;
+
+            case 11:
                 save_data();
                 printf("Data saved. Exiting Study Management System. Goodbye!\n");
                 return 0;
 
             default:
-                printf("Invalid choice. Please enter 1 to 6.\n");
+                printf("Invalid choice. Please enter 1 to 11.\n");
         }
     }
 

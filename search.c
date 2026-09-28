@@ -1,16 +1,6 @@
 #include "topic.h"
-#define case_insensitive  CI
 
-int CI(char *a, char *b){
-    while(*a && *b){
-        if(tolower(*a) != tolower(*b)){
-            return 0;
-        }
-        a++;
-        b++;
-    }
-    return (*a == '\0' && *b == '\0');
-}
+
 
 void searched_action(Topic* node){
     int ask;

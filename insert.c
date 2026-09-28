@@ -31,7 +31,7 @@ void insertfront(Topic* node){
         }
         
         print_topic(node);
-        save_data();
+        
     }
 
 }
@@ -54,7 +54,7 @@ void insertback(Topic* node){
         }
         
         print_topic(node);
-        save_data();
+        
     }
 }
 
@@ -70,7 +70,7 @@ void insert_any(Topic* node, Topic* temp){
         save->next=node;
     }
     print_topic(node);
-    save_data();
+    
 
 }
 
@@ -96,5 +96,10 @@ void insert_node_by_priority(Topic* node){
 void insert_prior(char subject[], char chapter[], int priority, int is_done){
     Topic* newNode=insert_init(subject,chapter,priority,is_done);
     insert_node_by_priority(newNode);
+    if(askYN==saveY){
+        currMode=save_master;
+        save_data();
+    }
+
 
 }

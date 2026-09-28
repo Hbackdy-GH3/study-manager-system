@@ -69,7 +69,7 @@ The master list is a **doubly linked list** so deletion and reinsertion (for pri
 
 **Study queue references, not copies** — `QueueNode` stores a `Topic*` pointing back into the master list, so the queue always reflects the latest data without duplicating it.
 
-**Filtered enqueue** — `enqueue()` uses a query-like `filter()` helper (status + priority) to pull a chosen number of matching topics into today's queue, similar to a database `WHERE` clause.
+**Filtered enqueue** — `enqueue_ask()` uses a query-like `filter()` helper (status + priority) to pull a chosen number of matching topics into today's queue, similar to a database `WHERE` clause.
 
 **Multi-word input handling** — subject and chapter fields accept spaces using `scanf(" %49[^\n]", ...)` instead of `%s`.
 

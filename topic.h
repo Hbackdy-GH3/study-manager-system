@@ -24,6 +24,16 @@ typedef struct QueueNode{
 extern QueueNode* front;
 extern QueueNode* back;
 
+enum SaveMode {save_master, save_queue};
+extern enum SaveMode currMode;
+
+enum when2save {saveY, saveN};
+extern enum when2save askYN;
+
+#define case_insensitive CI
+
+int CI(char *a, char *b);
+
 Topic* insert_init(char subject[], char chapter[], int priority, int is_done);
 void insert_prior(char subject[], char chapter[], int priority, int is_done);
 void insertfront(Topic* node);
@@ -45,9 +55,11 @@ void update_status(Topic* node);
 void filter_via();
 int filter(int* prior, int* stat);
 
-void enqueue();
+void enqueue_ask();
+void enqueue(Topic* node);
 void display_queue();
 void dequeue();
+void data_enqueue(char subject[], char chapter[]);
 
 void show_progress();
 void show_progress_queue();

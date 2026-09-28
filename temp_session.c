@@ -1,6 +1,6 @@
 #include "topic.h"
 
-void enqueue(){
+void enqueue_ask(){
     int n,t,stat,prior;
     Topic* temp=head;
     t=filter(&prior,&stat);
@@ -15,19 +15,7 @@ void enqueue(){
             int i=0;
             while(temp!=NULL && i<n){
                 if(temp->priority==prior && temp->is_done==stat){
-                    QueueNode* newNode=(QueueNode*)malloc(sizeof(QueueNode));
-                    if(newNode==NULL){
-                        printf("Today memory session empty");
-                        return;
-                    }
-                    newNode->topic=temp;
-                    newNode->next=NULL;
-                    if (front==NULL){
-                        front=back=newNode;
-                    } else{
-                        back->next=newNode;
-                        back=newNode;
-                    }
+                    enqueue(temp);
                     i++;
                 }
                 temp=temp->next;
@@ -35,8 +23,28 @@ void enqueue(){
         }
         break;
     }
+    currMode=save_queue;
+    save_data();
     printf("Tasks added in queue as per your requirement!");
 }
+
+void enqueue(Topic* node){
+    QueueNode* newNode=(QueueNode*)malloc(sizeof(QueueNode));
+    if(newNode==NULL){
+        printf("Today memory session empty");
+        return;
+    }
+    newNode->topic=node;
+    newNode->next=NULL;
+    if (front==NULL){
+        front=back=newNode;
+    }
+    else{
+        back->next=newNode;
+        back=newNode;
+    }
+}
+
 
 void display_queue(){
     QueueNode* temp=front;
@@ -63,11 +71,17 @@ void dequeue(){
         free(front);
         front=NULL;
         back=NULL;
+        printf("Removed from queue!\n");
+        currMode = save_queue;
+        save_data();
         return;
     }
     
     QueueNode* temp=front->next;
     free(front);
     front=temp;
+    currMode=save_queue;
+    save_data();
     printf("Removed from queue!\n");
+
 }

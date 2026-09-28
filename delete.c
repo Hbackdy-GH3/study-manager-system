@@ -82,14 +82,20 @@ void popfront(){
                     free(temp);
                     head=NULL;
                     tail=NULL;
-                    save_data();
+                    if(askYN==saveY){
+                        currMode=save_master;
+                        save_data();
+                    }
                     return;
                 }
                 head=head->next;
                 head->prev=NULL;
                 free(temp);
                 printf("Deleted!\n");
-                save_data();
+                if(askYN==saveY){
+                    currMode=save_master;
+                    save_data();
+                }
                 break;
             }
             
@@ -125,14 +131,20 @@ void popback(){
                     free(temp);
                     head=NULL;
                     tail=NULL;
-                    save_data();
+                    if(askYN==saveY){
+                        currMode=save_master;
+                        save_data();
+                    }
                     return;
                 }
                 tail=tail->prev;
                 tail->next=NULL;
                 free(temp);
                 printf("Deleted!\n");
-                save_data();
+                if(askYN==saveY){
+                    currMode=save_master;
+                    save_data();
+                }
                 break;
             }
             
@@ -163,7 +175,10 @@ void popany(Topic* node){
     node->prev->next=save;
     free(node);
     printf("Deleted!\n");
-    save_data();
+    if(askYN==saveY){
+        currMode=save_master;
+        save_data();
+    }
 }
 
 void remove_node(Topic* node){

@@ -2,6 +2,7 @@
 
 Topic* head=NULL;
 Topic* tail=NULL;
+int next_id=1;
 
 QueueNode* front=NULL;
 QueueNode* back=NULL;

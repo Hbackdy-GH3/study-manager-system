@@ -1,11 +1,17 @@
 #include "topic.h"
 
-Topic* insert_init(char subject[], char chapter[], int priority, int is_done){
+Topic* insert_init(int topic_id,char subject[], char chapter[], int priority, int is_done){
     Topic* newNode=(Topic*)malloc(sizeof(Topic));
     if(newNode==NULL){
         printf("Memory is full\n");
         return NULL;
-    } 
+    }
+    if(topic_id==0){
+        newNode->topic_id=next_id;
+        next_id++;
+    }else{
+        newNode->topic_id=topic_id;
+    }
     strcpy(newNode->subject, subject);    
     strcpy(newNode->chapter, chapter);
     newNode->priority=priority;
@@ -93,8 +99,8 @@ void insert_node_by_priority(Topic* node){
     }
 }
 
-Topic* insert_prior(char subject[], char chapter[], int priority, int is_done){
-    Topic* newNode=insert_init(subject,chapter,priority,is_done);
+Topic* insert_prior(int topic_id,char subject[], char chapter[], int priority, int is_done){
+    Topic* newNode=insert_init(topic_id,subject,chapter,priority,is_done);
     if (newNode == NULL){
         return NULL;
     }

@@ -5,6 +5,7 @@
 #include <time.h>
 
 typedef struct Topic{
+    int topic_id;
     char subject[50];
     char chapter[50];
     int priority;
@@ -18,6 +19,7 @@ typedef struct Topic{
 
 extern Topic* head;
 extern Topic* tail;
+extern int next_id;
 
 typedef struct QueueNode{
     Topic* topic;
@@ -62,8 +64,8 @@ void read_text(char* buf, int size);
 int read_date(void);
 void pause_screen(void);
 
-Topic* insert_init(char subject[], char chapter[], int priority, int is_done);
-Topic* insert_prior(char subject[], char chapter[], int priority, int is_done);
+Topic* insert_init(int topic_id, char subject[], char chapter[], int priority, int is_done);
+Topic* insert_prior(int topic_id, char subject[], char chapter[], int priority, int is_done);
 void insertfront(Topic* node);
 void insertback(Topic* node);
 void insert_any(Topic* node, Topic* temp);
@@ -80,6 +82,7 @@ void search_topic();
 void searched_action(Topic* node);
 void update_priority(Topic* node);
 void update_status(Topic* node);
+Topic* find_by_id(int id);
 
 void filter_via();
 int filter(int* prior, int* stat);
@@ -91,7 +94,7 @@ void enqueue_ask();
 int enqueue(Topic* node);
 void display_queue();
 void dequeue();
-void data_enqueue(char subject[], char chapter[]);
+// void data_enqueue(char subject[], char chapter[]);
 void remove_from_queue(Topic* node);
 int queue_count();
 

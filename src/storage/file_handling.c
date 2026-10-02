@@ -10,7 +10,7 @@ void save_data(){
         }
         Topic* temp=head;
         while(temp!=NULL){
-            fprintf(fptr, "%s,%s,%d,%d,%d,%d\n", temp->subject, temp->chapter, temp->priority, temp->is_done,temp->in_plan,temp->completed_on);
+            fprintf(fptr, "%d,%s,%s,%d,%d,%d,%d\n",temp->topic_id, temp->subject, temp->chapter, temp->priority, temp->is_done,temp->in_plan,temp->completed_on);
             temp=temp->next;
         }
     } else if(currMode==save_queue){
@@ -21,7 +21,7 @@ void save_data(){
         }
         QueueNode* temp=front;
         while(temp!=NULL){
-            fprintf(fptr, "%s,%s,%d,%d\n", temp->topic->subject, temp->topic->chapter, temp->topic->priority, temp->topic->is_done);
+            fprintf(fptr, "%d\n", temp->topic->topic_id);
             temp=temp->next;
         }
 
@@ -43,30 +43,38 @@ void save_data(){
 void load_data(){
     FILE* fptr;
     char line[256];
-    if(currMode==save_master){
+        if(currMode==save_master){
         fptr=fopen("data/data.txt", "r");
         if(fptr==NULL){
             return;
         }
         char subject[50], chapter[50];
-        int priority, is_done, in_plan, completed_on;
+        int topic_id,priority, is_done, in_plan, completed_on;
 
         enum when2save oldAskYN = askYN;
         askYN = saveN;
 
         while(fgets(line, sizeof(line), fptr)!=NULL){
-            in_plan=0;
-            completed_on=0;
-            int got=sscanf(line, "%49[^,],%49[^,],%d,%d,%d,%d",subject,chapter, &priority, &is_done, &in_plan, &completed_on);
-            if(got<4){
+            int got=sscanf(line, "%d,%49[^,],%49[^,],%d,%d,%d,%d",&topic_id,subject,chapter, &priority, &is_done, &in_plan, &completed_on);
+            if(got<7){
                 continue;
             }
-            Topic* node=insert_prior(subject, chapter, priority, is_done);
+            Topic* node=insert_prior(topic_id,subject, chapter, priority, is_done);
             if(node!=NULL){
                 node->in_plan=in_plan;
                 node->completed_on=completed_on;
             }
         }
+
+        int max_id=0;
+        Topic* temp=head;
+        while(temp!=NULL){
+            if(temp->topic_id>max_id){
+                max_id=temp->topic_id;
+            }
+            temp=temp->next;
+        }
+        next_id=max_id+1;
 
         askYN = oldAskYN;
     }else  if(currMode==save_queue){
@@ -74,12 +82,15 @@ void load_data(){
         if(fptr==NULL){
             return;
         }
-        char subject[50], chapter[50];
-        int priority, is_done;
+        
+        int topic_id;
 
         while(fgets(line, sizeof(line), fptr)!=NULL){
-            if(sscanf(line, "%49[^,],%49[^,],%d,%d",subject,chapter,&priority,&is_done)==4){
-                data_enqueue(subject, chapter);
+            if(sscanf(line, "%d", &topic_id)==1){
+                Topic* t=find_by_id(topic_id);
+                if(t!=NULL){
+                    enqueue(t);
+                }
             }
         }
     }
@@ -104,12 +115,12 @@ void load_data(){
 
 }
 
-void data_enqueue(char subject[], char chapter[]){
-    Topic* temp1=head;
-    while(temp1!=NULL){
-        if (CI(subject,temp1->subject) && CI(chapter,temp1->chapter)){
-            enqueue(temp1);
-        }
-        temp1=temp1->next;
-    }
-}
+// void data_enqueue(char subject[], char chapter[]){
+//     Topic* temp1=head;
+//     while(temp1!=NULL){
+//         if (CI(subject,temp1->subject) && CI(chapter,temp1->chapter)){
+//             enqueue(temp1);
+//         }
+//         temp1=temp1->next;
+//     }
+// }

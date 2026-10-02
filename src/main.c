@@ -117,7 +117,7 @@ int main(){
                 switch(add_choice){
 
                     case 1: {
-                        Topic* node = insert_init(subject, chapter, priority, 0);
+                        Topic* node = insert_init(0,subject, chapter, priority, 0);
                         if(node != NULL){
                             insertfront(node);
                             currMode = save_master;
@@ -127,7 +127,7 @@ int main(){
                     }
 
                     case 2: {
-                        Topic* node = insert_init(subject, chapter, priority, 0);
+                        Topic* node = insert_init(0,subject, chapter, priority, 0);
                         if(node != NULL){
                             insertback(node);
                             currMode = save_master;
@@ -137,7 +137,7 @@ int main(){
                     }
 
                     case 3:
-                        insert_prior(subject, chapter, priority, 0);
+                        insert_prior(0,subject, chapter, priority, 0);
                         break;
                 }
 

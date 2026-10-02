@@ -51,3 +51,14 @@ void search_topic(){
     }
     printf("Sorry, no topic found with subject \"%s\" and chapter \"%s\".\n", sub, ch);
 }
+
+Topic* find_by_id(int id){
+    Topic* temp=head;
+    while(temp!=NULL){
+        if(temp->topic_id==id){
+            return temp;
+        }
+        temp=temp->next;
+    }
+    return NULL;
+}

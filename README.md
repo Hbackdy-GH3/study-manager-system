@@ -32,7 +32,7 @@ A console-based study topic manager written in C, built around a **doubly linked
 - How many of them belong to the plan, today's target and whether it was reached
 
 **Persistence**
-- `data/data.txt`, `data/queue_data.txt` and `data/plan_data.txt` are saved after every change and loaded on startup. Older data files (4 or 5 columns) still load and are upgraded automatically.
+- `data/data.txt`, `data/queue_data.txt` and `data/plan_data.txt` are saved after every change and loaded on startup.
 
 **Safe input**
 - Typing letters where a number is expected, empty names, or commas in names just asks again instead of breaking the program.
@@ -114,6 +114,54 @@ gcc -Iinclude src/*.c src/*/*.c -o build/study_manager
 ./build/study_manager
 ```
 
+## Web version (WebAssembly)
+
+The same C code runs in the browser. `wasm/wasm_api.c` is a small bridge that the web page calls; `src/main.c` is not used there. Data is saved in the browser (IndexedDB), so it stays after closing the tab.
+
+```bash
+# 1. Build (needs emsdk; web/study.js and web/study.wasm are already built in the repo)
+build_wasm.bat          # Windows
+./build_wasm.sh         # Linux/macOS
+
+# 2. Run (a local server is needed, opening index.html directly will not load the .wasm)
+cd web
+python -m http.server 8000
+# open http://localhost:8000
+```
+
+Deploy: on Cloudflare Pages / Netlify / GitHub Pages, set the output folder to `web` with no build command.
+
+Backup: the sidebar has **Export**, which downloads `study-backup-YYYYMMDD.json` with all topics (status, completed date, plan and queue flags) and the plan, but no IDs. **Import** adds the topics from that file to the current list. Each one gets a new ID from the app, topics that already exist (same subject and chapter) are skipped, and the plan is added only if there is no plan yet.
+
+Import also takes a plain `.txt` / `.csv` topic list with **no IDs**, one topic per line:
+
+```
+subject,chapter,priority
+subject,chapter,priority,is_done,completed_on
+```
+
+Example: `DSA,Trees,1` or `Maths,Matrices,0,1,20261002` (priority 1 High, 0 Medium, -1 Low). The app gives every topic its ID.
+
+Files per topic: every topic row has a 📎 button (and **Add notes or files** in the ⋯ menu) to attach PDFs, images or any file up to 50 MB. Files are stored in the browser (IndexedDB), open in a new tab, open from the **Study next** card on Today, are deleted with their topic, and are included in Export / Import.
+
+Every console menu option works in the web version:
+
+| Console menu | Where in the web app |
+|---|---|
+| 1. Add topic (front / back / by priority) | **Add topic** button, “Where in the list” |
+| 2. Search / update / delete | Search box on Topics, then ⋯ for details, priority, status, delete |
+| 3. Delete front / back / anywhere | Topics → **List tools** → Delete first / last, or ⋯ → Delete |
+| 4. Display all topics | **Topics** in list order with No. (or grouped by subject) |
+| 5. Filter topics | Pending / Done tabs, priority and subject pickers |
+| 6. Add topics to today's queue | **List tools → Add several to today's queue** (pending or revision, priority, how many) or “+ Today” on a row |
+| 7. Show today's queue | **Today**: Study next + Up next |
+| 8. Study next topic | Today: **Mark as done** / **Not today** |
+| 9. Progress (master list) | **Progress**: all topics, by priority, by subject |
+| 10. Progress (queue) | Progress: today's queue |
+| 11–15. Plan create / check / update / delete / fill | **Plan** page |
+| 16. Today's report | Progress: daily report |
+| 17. Save & exit | Saves on every change |
+
 ## Menu
 
 ```
@@ -136,8 +184,8 @@ gcc -Iinclude src/*.c src/*/*.c -o build/study_manager
 
 | File | Format |
 |---|---|
-| `data/data.txt` | `subject,chapter,priority,is_done,in_plan,completed_on` |
-| `data/queue_data.txt` | `subject,chapter,priority,is_done` |
+| `data/data.txt` | `topic_id,subject,chapter,priority,is_done,in_plan,completed_on` |
+| `data/queue_data.txt` | one `topic_id` per line |
 | `data/plan_data.txt` | `start_date,end_date,start_totals,base_pace,plan_name` |
 
 ## Roadmap
@@ -150,11 +198,13 @@ gcc -Iinclude src/*.c src/*/*.c -o build/study_manager
 - [x] Study plan with targets, progress and queue filling
 - [x] Daily report
 - [ ] Subtopic support via a `child` pointer
-- [ ] Show the study plan in the browser frontend
-- [ ] WebAssembly build for a browser-based frontend
+- [x] Topic IDs (queue saved by ID)
+- [x] WebAssembly build with a browser frontend (`web/`)
+- [x] Attachments per topic (web)
 
 ## Tech
 
 - Language: C
 - No external libraries — only `stdio.h`, `stdlib.h`, `string.h`
-- Compiled and tested with `gcc`
+- Compiled and tested with `gcc` (console) and Emscripten (web)
+- Web frontend: plain HTML, CSS and JavaScript

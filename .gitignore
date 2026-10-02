@@ -1,4 +1,22 @@
+# build/*
+# !build/.gitkeep
+# *.exe
+# data/data.txt
+# Build output
 build/*
 !build/.gitkeep
 *.exe
-data/data.txt
+*.o
+
+# Personal study data (console app writes these)
+data/*
+!data/.gitkeep
+
+# Exported backups from the web app
+study-backup-*.json
+
+# Editor and OS files
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini

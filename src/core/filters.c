@@ -1,227 +1,120 @@
 #include "topic.h"
 
-void filter_via(){
-    int ask;
-    printf("1. Show Pending works");
-    printf("2. Show Completed works");
-    printf("3. Show specific priority (High/Medium/Low)");
-    printf("Enter your choice: \n");
-    scanf("%d", &ask);
-    while(1){
-        switch (ask){
-            case 1: {
-                Topic* temp=head;
-                while(temp!=NULL){
-                    if(temp->is_done==0){
-                        print_topic(temp);
-                    }
-                    temp=temp->next;
-                }
+int print_matching(int status, int priority){
+    Topic* temp=head;
+    int no=0;
+    while(temp!=NULL){
+        if((status==-1 || temp->is_done==status) && (priority==2 || temp->priority==priority)){
+            if(no==0){
+                print_table_header();
             }
-                break;
-            case 2: {
-                Topic* temp=head;
-                while(temp!=NULL){
-                    if(temp->is_done==1){
-                        print_topic(temp);
-                    }
-                    temp=temp->next;
-                }
-            }
-                break;
-            case 3: {
-                int choice;
-                printf("1 for High\n");
-                printf("0 for Medium\n");
-                printf("-1 for Low\n");
-                printf("Enter you choice: \n");
-                while(1){
-                    scanf("%d", &choice);
-                    switch (choice){
-                        case 1: {
-                            Topic* temp=head;
-                            while(temp!=NULL){
-                                if(temp->priority==1){
-                                    print_topic(temp);
-                                }
-                                temp=temp->next;
-                            }
-                        }
-                            break;
-                        case 0: {
-                            Topic* temp=head;
-                            while(temp!=NULL){
-                                if(temp->priority==0){
-                                    print_topic(temp);
-                                }
-                                temp=temp->next;
-                            }
-                        }
-                            break;
-                        case -1: {
-                            Topic* temp=head;
-                            while(temp!=NULL){
-                                if(temp->priority==-1){
-                                    print_topic(temp);
-                                }
-                                temp=temp->next;
-                            }
-                        }
-                            break;
-                        default:
-                            printf("Please Enter valid number: 1 0 -1");
-                            continue;
-                    }
-                    break;
-                }
-            }
-            break;
-            default:
-                printf("Please Enter valid number: 1 to 3");
-                continue;
+            no++;
+            print_topic_row(no, temp);
         }
-        break;
+        temp=temp->next;
+    }
+    if(no==0){
+        printf("No topics found.\n");
+    } else{
+        printf("\nTotal: %d topic(s)\n", no);
+    }
+    return no;
+}
+
+void filter_via(){
+    printf("\nChoose the filter:\n");
+    printf("  1. Pending topics\n");
+    printf("  2. Completed topics\n");
+    printf("  3. Topics of one priority (High/Medium/Low)\n");
+    printf("Enter your choice: ");
+    int ask=read_choice(1, 3);
+
+    switch (ask){
+        case 1:
+            print_header("PENDING TOPICS");
+            print_matching(0, 2);
+            break;
+        case 2:
+            print_header("COMPLETED TOPICS");
+            print_matching(1, 2);
+            break;
+        case 3: {
+            printf("\nChoose priority:\n");
+            printf("   1 = High\n");
+            printf("   0 = Medium\n");
+            printf("  -1 = Low\n");
+            printf("Enter priority: ");
+            int choice=read_priority();
+            if(choice==1){
+                print_header("HIGH PRIORITY TOPICS");
+            } else if(choice==0){
+                print_header("MEDIUM PRIORITY TOPICS");
+            } else{
+                print_header("LOW PRIORITY TOPICS");
+            }
+            print_matching(-1, choice);
+            break;
+        }
     }
 }
 
 
 int filter(int* prior, int* stat){
-    printf("1. Show Pending works\n");
-    printf("2. Show Completed works\n");
-    printf("Enter your choice: \n");
-
-    while(1){
-        scanf("%d", stat);
-
-        switch (*stat){
-
-            case 1: {
-                int n1=0,n2=0,n3=0;
-                int choice;
-                Topic* temp=head;
-
-                while(temp!=NULL){
-                    if(temp->is_done==0){
-                        if(temp->priority==1){
-                            n1++;
-                        }
-                        else if(temp->priority==0){
-                            n2++;
-                        }
-                        else if(temp->priority==-1){
-                            n3++;
-                        }
-                    }
-                    temp=temp->next;
-                }
-
-                printf("Total pending works\n");
-                printf("High: %d\n",n1);
-                printf("Medium: %d\n",n2);
-                printf("Low: %d\n",n3);
-
-                printf("Which priority do you want?\n");
-                printf("1. High\n");
-                printf("0. Medium\n");
-                printf("-1. Low\n");
-
-                while(1){
-                    scanf("%d",&choice);
-
-                    switch(choice){
-                        case 1:
-                            *prior=1;
-                            *stat=0;
-                            return n1;
-
-                        case 0:
-                            *prior=0;
-                            *stat=0;
-                            return n2;
-
-                        case -1:
-                            *prior=-1;
-                            *stat=0;
-                            return n3;
-
-                        default:
-                            printf("Please enter 1 0 or -1: ");
-                    }
-                }
-            }
-
-            case 2: {
-                int n1=0,n2=0,n3=0;
-                int choice;
-                Topic* temp=head;
-
-                while(temp!=NULL){
-                    if(temp->is_done==1){
-                        if(temp->priority==1){
-                            n1++;
-                        }
-                        else if(temp->priority==0){
-                            n2++;
-                        }
-                        else if(temp->priority==-1){
-                            n3++;
-                        }
-                    }
-                    temp=temp->next;
-                }
-
-                printf("Total completed works\n");
-                printf("High: %d\n",n1);
-                printf("Medium: %d\n",n2);
-                printf("Low: %d\n",n3);
-
-                printf("Which priority do you want?\n");
-                printf("1. High\n");
-                printf("0. Medium\n");
-                printf("-1. Low\n");
-
-                while(1){
-                    scanf("%d",&choice);
-
-                    switch(choice){
-                        case 1:
-                            *prior=1;
-                            *stat=1;
-                            return n1;
-
-                        case 0:
-                            *prior=0;
-                            *stat=1;
-                            return n2;
-
-                        case -1:
-                            *prior=-1;
-                            *stat=1;
-                            return n3;
-
-                        default:
-                            printf("Please enter 1 0 or -1: ");
-                    }
-                }
-            }
-
-            default:
-                printf("Please Enter valid number: 1 or 2\n");
-        }
+    printf("\nWhich topics do you want to add?\n");
+    printf("  1. Pending topics\n");
+    printf("  2. Completed topics (for revision)\n");
+    printf("Enter your choice: ");
+    int s=read_choice(1, 2);
+    if(s==1){
+        *stat=0;
+    } else{
+        *stat=1;
     }
-}
 
-void filter_plan(){
-    if(head==NULL){
-        printf("Data not found!");
-    }
+    int n1=0,n2=0,n3=0;
     Topic* temp=head;
     while(temp!=NULL){
-        if(temp->in_plan==1){
-            print_topic(temp);
+        if(temp->is_done==*stat){
+            if(temp->priority==1){
+                n1++;
+            }
+            else if(temp->priority==0){
+                n2++;
+            }
+            else if(temp->priority==-1){
+                n3++;
+            }
         }
         temp=temp->next;
     }
+
+    if(*stat==0){
+        printf("\nPending topics available:\n");
+    } else{
+        printf("\nCompleted topics available:\n");
+    }
+    printf("  High   : %d\n", n1);
+    printf("  Medium : %d\n", n2);
+    printf("  Low    : %d\n", n3);
+
+    printf("\nWhich priority do you want?\n");
+    printf("   1 = High\n");
+    printf("   0 = Medium\n");
+    printf("  -1 = Low\n");
+    printf("Enter priority: ");
+    *prior=read_priority();
+
+    if(*prior==1){
+        return n1;
+    }
+    if(*prior==0){
+        return n2;
+    }
+    return n3;
+}
+
+void filter_plan(){
+    display_plan_topic();
 }
 
 void filter_plan_via_status(int* n1,int* n2){

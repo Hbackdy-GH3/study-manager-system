@@ -9,6 +9,7 @@ int today_ymd()
 int valid_date(int date)
 {   
     if(date < 10000000 || date > 99999999){
+        printf("  Date must have 8 digits (YYYYMMDD), like 20261005.\n");
         return 1;
     }
     int today = today_ymd();
@@ -18,7 +19,7 @@ int valid_date(int date)
 
     if (month < 1 || month > 12)
     {
-        printf("Month is wrong!\n");
+        printf("  Month must be between 01 and 12.\n");
         return 1;
     }
 
@@ -26,13 +27,13 @@ int valid_date(int date)
 
     if (day < 1 || day > max_day)
     {
-        printf("There is no such day in this month\n");
+        printf("  This month does not have that day.\n");
         return 1;
     }
 
     if (date < today)
     {
-        printf("You have entered old date\n");
+        printf("  This date is already over. Enter today or a future date.\n");
         return 1;
     }
 
@@ -100,11 +101,9 @@ char* display_date(int date){
     int month = (date / 100) % 100;
     int day   = date % 100;
 
-    static char date_format[12];
+    static char date_format[16];
 
-    snprintf(date_format, sizeof(date_format), "%02d/%02d%04d", day, month, year);
+    snprintf(date_format, sizeof(date_format), "%02d/%02d/%04d", day, month, year);
 
     return date_format;
-    
-    
 }

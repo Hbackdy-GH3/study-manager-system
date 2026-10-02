@@ -1,131 +1,86 @@
 #include "topic.h"
 
-void pop(){
-    int choice;
-    printf("AT WHICH NODE , DO YOU WANT TO DELETE ?");
-    printf("1. FRONT?");
-    printf("2. BACK?");
-    printf("3. ANWHERE IN BETWEEN?");
-    while (1){
-        printf("Enter your choice: ");
-        scanf("%d",&choice);
-        switch (choice){
-            case 1:
-                popfront();
-                break;
-            case 2: 
-                popback();
-                break;
-            case 3:
-                search_topic();
-                // popany(temp);
-                break;
+void save_master_now(){
+    if(askYN==saveY){
+        currMode=save_master;
+        save_data();
+        if(plan.exists==1){
+            cal_start_totals();
+            currMode=save_plan;
+            save_data();
+            currMode=save_master;
+        }
+    }
+}
 
-            default:
-                printf("Invalid choice. Enter 1 or 2 or 3: ");
-                continue;
-        }
-        if(choice==1 || choice==2 || choice==3 ){
+void pop(){
+    printf("\nWhere do you want to delete?\n");
+    printf("  1. Front\n");
+    printf("  2. Back\n");
+    printf("  3. Anywhere in between (search by name)\n");
+    printf("Enter your choice: ");
+    int choice=read_choice(1, 3);
+    switch (choice){
+        case 1:
+            popfront();
             break;
-        }
+        case 2:
+            popback();
+            break;
+        case 3:
+            search_topic();
+            break;
     }
 }
 
 void popfront(){
     if(head==NULL){
-        printf("File is empty.");
+        printf("The list is empty.\n");
         return;
     }
     print_topic(head);
-    printf("\n do you want to delete the topic?\n1.Yes\n2.No\n");
-    int ans;
-
-    while (1) {
-        scanf("%d", &ans);
-        switch (ans){
-            case 1:{
-                Topic* temp=head;
-                if(head==tail){
-                    free(temp);
-                    head=NULL;
-                    tail=NULL;
-                    if(askYN==saveY){
-                        currMode=save_master;
-                        save_data();
-                    }
-                    return;
-                }
-                head=head->next;
-                head->prev=NULL;
-                free(temp);
-                printf("Deleted!\n");
-                if(askYN==saveY){
-                    currMode=save_master;
-                    save_data();
-                }
-                break;
-            }
-            
-            case 2:
-                printf("Topic remains same.\n");
-                break;
-            
-            default:
-                printf("Invalid choice. Enter 1 or 2: ");
-        }
-        if(ans==1 || ans==2){
-            break;
-        }
+    printf("Do you want to delete this topic? (Y/N): ");
+    if(read_yn()=='N'){
+        printf("Topic not deleted.\n");
+        return;
     }
+    Topic* temp=head;
+    remove_from_queue(temp);
+    if(head==tail){
+        head=NULL;
+        tail=NULL;
+    } else{
+        head=head->next;
+        head->prev=NULL;
+    }
+    free(temp);
+    printf("Topic deleted.\n");
+    save_master_now();
 }
 
 void popback(){
     if(head==NULL){
-        printf("File is empty.");
+        printf("The list is empty.\n");
         return;
     }
     print_topic(tail);
-    printf("\n do you want to delete the topic?\n1.Yes\n2.No\n");
-    int ans;
-
-    while (1) {
-        scanf("%d", &ans);
-        switch (ans){
-            case 1:{
-                
-                Topic* temp=tail;
-                if(head==tail){
-                    free(temp);
-                    head=NULL;
-                    tail=NULL;
-                    if(askYN==saveY){
-                        currMode=save_master;
-                        save_data();
-                    }
-                    return;
-                }
-                tail=tail->prev;
-                tail->next=NULL;
-                free(temp);
-                printf("Deleted!\n");
-                if(askYN==saveY){
-                    currMode=save_master;
-                    save_data();
-                }
-                break;
-            }
-            
-            case 2:
-                printf("Topic remains same.\n");
-                break;
-            
-            default:
-                printf("Invalid choice. Enter 1 or 2: ");
-        }
-        if(ans==1 || ans==2){
-            break;
-        }
+    printf("Do you want to delete this topic? (Y/N): ");
+    if(read_yn()=='N'){
+        printf("Topic not deleted.\n");
+        return;
     }
+    Topic* temp=tail;
+    remove_from_queue(temp);
+    if(head==tail){
+        head=NULL;
+        tail=NULL;
+    } else{
+        tail=tail->prev;
+        tail->next=NULL;
+    }
+    free(temp);
+    printf("Topic deleted.\n");
+    save_master_now();
 }
 
 void popany(Topic* node){
@@ -137,28 +92,28 @@ void popany(Topic* node){
         popback();
         return;
     }
+    remove_from_queue(node);
     Topic* save=node->next;
     save->prev=node->prev;
     node->prev->next=save;
     free(node);
-    printf("Deleted!\n");
-    if(askYN==saveY){
-        currMode=save_master;
-        save_data();
-    }
+    printf("Topic deleted.\n");
+    save_master_now();
 }
 
 void remove_node(Topic* node){
-    if(node->prev != NULL)
-        node->prev->next = node->next;
-    else
-        head = node->next;
+    if(node->prev!=NULL){
+        node->prev->next=node->next;
+    } else{
+        head=node->next;
+    }
 
-    if(node->next != NULL)
-        node->next->prev = node->prev;
-    else
-        tail = node->prev;
+    if(node->next!=NULL){
+        node->next->prev=node->prev;
+    } else{
+        tail=node->prev;
+    }
 
-    node->next = NULL;
-    node->prev = NULL;
+    node->next=NULL;
+    node->prev=NULL;
 }

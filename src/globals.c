@@ -1,5 +1,4 @@
 #include "topic.h"
-#define case_insensitive  CI
 
 Topic* head=NULL;
 Topic* tail=NULL;
@@ -23,6 +22,3 @@ int CI(char *a, char *b){
     }
     return (*a == '\0' && *b == '\0');
 }
-
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define MIN(a, b) ((a) < (b) ? (a) : (b))

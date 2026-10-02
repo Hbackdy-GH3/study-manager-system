@@ -2,46 +2,42 @@
 
 void print_menu(){
     printf("\n========================================\n");
-    printf("      STUDY MANAGEMENT SYSTEM\n");
+    printf("        STUDY MANAGEMENT SYSTEM\n");
     printf("========================================\n");
 
-    printf("Choose what you want to do:\n\n");
+    printf(" Master Topic List\n");
+    printf("   1. Add Topic\n");
+    printf("   2. Search / Update / Delete a Topic\n");
+    printf("   3. Delete Topic (front/back/anywhere)\n");
+    printf("   4. Display All Topics\n");
+    printf("   5. Filter Topics\n");
 
-    printf("--- Master Topic List ---\n");
-    printf("1. Add Topic\n");
-    printf("2. Search / Update / Delete a Topic\n");
-    printf("3. Delete Topic (front/back/anywhere)\n");
-    printf("4. Display All Topics\n");
-    printf("5. Filter Topics\n");
+    printf(" Today's Study Queue\n");
+    printf("   6. Add Topics to Today's Queue\n");
+    printf("   7. Show Today's Queue\n");
+    printf("   8. Study Next Topic\n");
 
-    printf("--- Today's Study Queue ---\n");
-    printf("6. Add Topics to Today's Queue\n");
-    printf("7. Show Today's Queue\n");
-    printf("8. Study Next Topic (Dequeue)\n");
+    printf(" Progress\n");
+    printf("   9. Show Progress (Master List)\n");
+    printf("  10. Show Progress (Today's Queue)\n");
 
-    printf("--- Progress ---\n");
-    printf("9. Show Progress (Master List)\n");
-    printf("10. Show Progress (Today's Queue)\n");
+    printf(" Study Plan\n");
+    printf("  11. Create Plan\n");
+    printf("  12. Check Plan\n");
+    printf("  13. Update Plan\n");
+    printf("  14. Delete Plan\n");
+    printf("  15. Fill Today's Queue from Plan\n");
+    printf("  16. Today's Report\n");
 
-    printf("--- Study Plan ---\n");
-    printf("11. Create Plan\n");
-    printf("12. Check Plan\n");
-    printf("13. Update Plan\n");
-    printf("14. Delete Plan\n");
-    printf("15. Fill Today's Queue from Plan\n");
-
-    printf("--- Program ---\n");
-    printf("16. Save & Exit\n");
+    printf(" Program\n");
+    printf("  17. Save & Exit\n");
 
     printf("========================================\n");
-    printf("Choose option 1 to 16\n");
-    printf("Enter your choice: ");
+    printf("Enter your choice (1-17): ");
 }
-
 
 int main(){
 
-    /* load order matters: master first, queue and plan depend on its topics */
     currMode = save_master;
     load_data();
 
@@ -51,10 +47,8 @@ int main(){
     currMode = save_plan;
     load_data();
 
-    currMode = save_master;     /* back to default */
+    currMode = save_master;
 
-    /* safety: no plan exists, so no topic should be marked in_plan
-       (happens if the program was closed with Ctrl+C or plan_data.txt was deleted) */
     if(plan.exists == 0){
         int changed = 0;
         Topic* temp = head;
@@ -71,102 +65,83 @@ int main(){
         }
     }
 
+    currMode = save_master;
+    save_data();
+
+    print_header("WELCOME BACK");
+    printf("  Today        : %s\n", display_date(today_ymd()));
+    printf("  Topics       : %d\n", count_topics());
+    printf("  In queue     : %d\n", queue_count());
     if(plan.exists == 1){
-        printf("\n--- Your Study Plan ---\n");
+        printf("  Study plan   : %s\n", plan.plan_name);
         status_plan();
-        printf("\n");
+    } else{
+        printf("  Study plan   : none (create one with option 11)\n");
     }
 
-    int choice;
+    if(head != NULL){
+        print_header("YOUR TOPICS");
+        print_all();
+    }
+
     char subject[50], chapter[50];
     int priority;
 
     while(1){
 
         print_menu();
-        scanf("%d",&choice);
+        int choice = read_int();
 
         switch(choice){
 
             /* ================= ADD TOPIC ================= */
 
             case 1: {
-                int add_choice;
-
-                printf("\nYou selected: Add Topic\n");
-
-                printf("\nChoose where you want to add the topic:\n");
-                printf("1. Add at Front\n");
-                printf("2. Add at Back\n");
-                printf("3. Add by Priority (recommended)\n");
-
-                printf("\nChoose option 1, 2 or 3\n");
+                print_header("ADD TOPIC");
+                printf("Where do you want to add the topic?\n");
+                printf("  1. At the front\n");
+                printf("  2. At the back\n");
+                printf("  3. By priority (recommended)\n");
                 printf("Enter your choice: ");
-                scanf("%d",&add_choice);
+                int add_choice = read_choice(1, 3);
 
-                printf("\nEnter topic details:\n");
+                printf("\nSubject: ");
+                read_text(subject, sizeof(subject));
 
-                printf("Enter subject: ");
-                scanf(" %49[^\n]",subject);
+                printf("Chapter: ");
+                read_text(chapter, sizeof(chapter));
 
-                printf("Enter chapter: ");
-                scanf(" %49[^\n]",chapter);
-
-                printf("\nChoose priority:\n");
-                printf("1 = High\n");
-                printf("0 = Medium\n");
-                printf("-1 = Low\n");
-
-                printf("Choose priority 1, 0 or -1\n");
-                printf("Enter priority: ");
-                scanf("%d",&priority);
+                printf("Priority (1 = High, 0 = Medium, -1 = Low): ");
+                priority = read_priority();
 
                 switch(add_choice){
 
                     case 1: {
-                        Topic* node = insert_init(
-                            subject,
-                            chapter,
-                            priority,
-                            0
-                        );
-
+                        Topic* node = insert_init(subject, chapter, priority, 0);
                         if(node != NULL){
                             insertfront(node);
+                            currMode = save_master;
+                            save_data();
                         }
                         break;
                     }
 
                     case 2: {
-                        Topic* node = insert_init(
-                            subject,
-                            chapter,
-                            priority,
-                            0
-                        );
-
+                        Topic* node = insert_init(subject, chapter, priority, 0);
                         if(node != NULL){
                             insertback(node);
+                            currMode = save_master;
+                            save_data();
                         }
                         break;
                     }
 
                     case 3:
-                        insert_prior(
-                            subject,
-                            chapter,
-                            priority,
-                            0
-                        );
+                        insert_prior(subject, chapter, priority, 0);
                         break;
-
-                    default:
-                        printf("\nChoose option 1, 2 or 3 only.\n");
                 }
 
-                printf("\nAdd Topic operation completed.\n");
-                printf("Now choose your next option from the main menu.\n");
-
+                printf("Topic added.\n");
                 break;
             }
 
@@ -174,250 +149,150 @@ int main(){
             /* ================= SEARCH / UPDATE / DELETE ================= */
 
             case 2:
-
-                printf("\nYou selected: Search / Update / Delete a Topic\n");
-                printf("Choose this option to search a topic first.\n");
-
+                print_header("SEARCH TOPIC");
                 if(head == NULL){
-                    printf("List is empty. Nothing to search.\n");
+                    printf("The list is empty. Nothing to search.\n");
                 }
                 else{
                     search_topic();
                 }
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= DELETE ================= */
 
             case 3:
-
-                printf("\nYou selected: Delete Topic\n");
-
+                print_header("DELETE TOPIC");
                 if(head == NULL){
-                    printf("List is empty. Nothing to delete.\n");
+                    printf("The list is empty. Nothing to delete.\n");
                 }
                 else{
-                    printf("\nChoose where you want to delete:\n");
-                    printf("1. Front\n");
-                    printf("2. Back\n");
-                    printf("3. Anywhere in between\n");
-
-                    printf("\nChoose option 1, 2 or 3 inside delete menu.\n");
-
                     pop();
                 }
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= DISPLAY ================= */
 
             case 4:
-
-                printf("\nYou selected: Display All Topics\n");
-                printf("Choose this option to see all topics in the master list.\n");
-
+                print_header("ALL TOPICS");
                 if(head == NULL){
-                    printf("List is empty.\n");
+                    printf("The list is empty. Add topics with option 1.\n");
                 }
                 else{
                     print_all();
+                    printf("\nTotal: %d topic(s)\n", count_topics());
                 }
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= FILTER ================= */
 
             case 5:
-
-                printf("\nYou selected: Filter Topics\n");
-                printf("Choose the filter you want:\n");
-                printf("1. Pending\n");
-                printf("2. Completed\n");
-                printf("3. Specific Priority\n");
-
-                printf("\nChoose option 1, 2 or 3 inside filter menu.\n");
-
+                print_header("FILTER TOPICS");
                 if(head == NULL){
-                    printf("List is empty. Nothing to filter.\n");
+                    printf("The list is empty. Nothing to filter.\n");
                 }
                 else{
                     filter_via();
                 }
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= ENQUEUE ================= */
 
             case 6:
-
-                printf("\nYou selected: Add Topics to Today's Queue\n");
-
+                print_header("ADD TO TODAY'S QUEUE");
                 if(head == NULL){
-                    printf("Master list is empty, nothing to add to queue.\n");
+                    printf("The list is empty. Add topics with option 1.\n");
                 }
                 else{
-                    printf("Choose Pending/Completed first.\n");
-                    printf("Then choose High/Medium/Low.\n");
-                    printf("Then enter how many tasks you want to study.\n");
-
                     enqueue_ask();
                 }
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= DISPLAY QUEUE ================= */
 
             case 7:
-
-                printf("\nYou selected: Show Today's Queue\n");
-                printf("Choose this option to display your current study queue.\n");
-
                 display_queue();
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= DEQUEUE ================= */
 
             case 8:
-
-                printf("\nYou selected: Study Next Topic\n");
-                printf("Choose this option to remove and study the first topic in today's queue.\n");
-
+                print_header("STUDY NEXT TOPIC");
                 dequeue();
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= MASTER PROGRESS ================= */
 
             case 9:
-
-                printf("\nYou selected: Show Progress (Master List)\n");
-                printf("Choose this option to see progress of the complete master list.\n");
-
                 show_progress();
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= QUEUE PROGRESS ================= */
 
             case 10:
-
-                printf("\nYou selected: Show Progress (Today's Queue)\n");
-                printf("Choose this option to see progress of today's study queue.\n");
-
                 show_progress_queue();
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= CREATE PLAN ================= */
 
             case 11:
-
-                printf("\nYou selected: Create Plan\n");
-
                 if(head == NULL){
-                    printf("Master list is empty. Add topics first.\n");
+                    printf("\nThe list is empty. Add topics first (option 1).\n");
                 }
                 else{
                     creation_plan();
                 }
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= CHECK PLAN ================= */
 
             case 12:
-
-                printf("\nYou selected: Check Plan\n");
-
                 check_plan();
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= UPDATE PLAN ================= */
 
             case 13:
-
-                printf("\nYou selected: Update Plan\n");
-
                 update_plan();
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= DELETE PLAN ================= */
 
             case 14:
-
-                printf("\nYou selected: Delete Plan\n");
-
+                print_header("DELETE PLAN");
                 delete_plan();
-
-                printf("\nNow choose your next option from the main menu.\n");
-
                 break;
 
 
             /* ================= FILL QUEUE FROM PLAN ================= */
 
             case 15:
+                print_header("FILL QUEUE FROM PLAN");
+                fill_queue_from_plan();
+                break;
 
-                printf("\nYou selected: Fill Today's Queue from Plan\n");
 
-                if(plan.exists == 0){
-                    printf("You have no plan yet. Create one first (option 11).\n");
-                }
-                else{
-                    fill_queue_from_plan();
-                }
+            /* ================= DAILY REPORT ================= */
 
-                printf("\nNow choose your next option from the main menu.\n");
-
+            case 16:
+                daily_reports();
                 break;
 
 
             /* ================= SAVE & EXIT ================= */
 
-            case 16:
-
-                printf("\nYou selected: Save & Exit\n");
-                printf("Saving all current data...\n");
-
+            case 17:
                 currMode = save_master;
                 save_data();
 
@@ -427,25 +302,20 @@ int main(){
                 currMode = save_plan;
                 save_data();
 
-                printf("Data saved successfully.\n");
-                printf("Exiting Study Management System. Goodbye!\n");
+                currMode = save_master;
 
+                printf("\nAll data saved. Goodbye!\n");
                 return 0;
 
 
             /* ================= INVALID ================= */
 
             default:
-
-                printf("\nInvalid choice.\n");
-                printf("Choose option from 1 to 16 only.\n");
-
+                printf("\nInvalid choice. Enter a number from 1 to 17.\n");
                 break;
         }
 
-        printf("\nPress Enter and then choose your next option...\n");
-        getchar();
-        getchar();
+        pause_screen();
     }
 
     return 0;

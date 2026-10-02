@@ -11,13 +11,12 @@ Topic* insert_init(char subject[], char chapter[], int priority, int is_done){
     newNode->priority=priority;
     newNode->is_done=is_done;
     newNode->in_plan=0;
+    newNode->completed_on=0;
     return newNode;
 }
 
 
 void insertfront(Topic* node){
-    // Topic* newNode=insert_init(subject,chapter,priority,is_done);
-
     if (node!=NULL){
         if(head==NULL){
             node->next=NULL;
@@ -31,15 +30,14 @@ void insertfront(Topic* node){
             head->prev=NULL;
         }
         
-        print_topic(node);
-        
+        if(askYN==saveY){
+            print_topic(node);
+        }
     }
 
 }
 
 void insertback(Topic* node){
-    // Topic* newNode=insert_init(subject,chapter,priority,is_done);
-
     if(node!=NULL){
         if(head==NULL){
             node->next=NULL;
@@ -54,8 +52,9 @@ void insertback(Topic* node){
             
         }
         
-        print_topic(node);
-        
+        if(askYN==saveY){
+            print_topic(node);
+        }
     }
 }
 
@@ -70,9 +69,9 @@ void insert_any(Topic* node, Topic* temp){
     }else{
         save->next=node;
     }
-    print_topic(node);
-    
-
+    if(askYN==saveY){
+        print_topic(node);
+    }
 }
 
 void insert_node_by_priority(Topic* node){
@@ -96,9 +95,8 @@ void insert_node_by_priority(Topic* node){
 
 Topic* insert_prior(char subject[], char chapter[], int priority, int is_done){
     Topic* newNode=insert_init(subject,chapter,priority,is_done);
-    if (newNode == NULL)
-    {
-        return NULL;            
+    if (newNode == NULL){
+        return NULL;
     }
     insert_node_by_priority(newNode);
     if(askYN==saveY){

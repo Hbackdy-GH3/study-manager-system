@@ -19,8 +19,23 @@ A console-based study topic manager written in C, built around a **doubly linked
 - Display — view everything currently queued for today
 - Task count — see how many topics remain in today's queue
 
+**Study Plan**
+- Create a plan: pick pending topics, give a name, start date and end date (YYYYMMDD, validated)
+- Base pace = topics per day needed when the plan starts
+- Check plan: details, days left, today's target, progress %, and status (Behind / On track / Ahead)
+- Update plan: add or remove topics, fill today's queue from the plan
+- Extend an ended plan or delete it
+- Fill today's queue from the plan: adds exactly today's target, high priority first, no duplicates
+
+**Daily Report**
+- Topics completed today (each topic stores the date it was completed)
+- How many of them belong to the plan, today's target and whether it was reached
+
 **Persistence**
-- The master list is automatically saved to `data.txt` after every insert, update, and delete, and reloaded on startup. The study queue is intentionally session-only and is not persisted.
+- `data/data.txt`, `data/queue_data.txt` and `data/plan_data.txt` are saved after every change and loaded on startup. Older data files (4 or 5 columns) still load and are upgraded automatically.
+
+**Safe input**
+- Typing letters where a number is expected, empty names, or commas in names just asks again instead of breaking the program.
 
 ## Architecture
 
@@ -37,8 +52,9 @@ Std. management/
 │   │   ├── update.c         # update_priority (with re-sort), update_status
 │   │   ├── search.c         # case-insensitive search, searched_action
 │   │   ├── filters.c        # pending/completed/priority filters
-│   │   ├── display.c        # print_topic, print_all
-│   │   └── progress_stat.c  # progress for master list, queue and plan
+│   │   ├── display.c        # print_topic (box), print_topic_row (table), print_all
+│   │   ├── input.c          # safe input: read_int, read_choice, read_yn, read_text, read_date
+│   │   └── progress_stat.c  # progress for master list, queue, plan + daily report
 │   ├── queue/
 │   │   └── temp_session.c   # today's study queue: enqueue, dequeue, display
 │   ├── plan/                # study plan feature
@@ -101,24 +117,28 @@ gcc -Iinclude src/*.c src/*/*.c -o build/study_manager
 ## Menu
 
 ```
---- Master Topic List ---
-1. Add Topic
-2. Search / Update / Delete a Topic
-3. Delete Topic (front/back/anywhere)
-4. Display All Topics
-5. Filter Topics
---- Today's Study Queue ---
-6. Add Topics to Today's Queue
-7. Show Today's Queue
-8. Study Next Topic (Dequeue)
---- Progress ---
-9. Show Progress (Master List)
-10. Show Progress (Today's Queue)
---- Program ---
-11. Save & Exit
+ Master Topic List          Study Plan
+   1. Add Topic               11. Create Plan
+   2. Search/Update/Delete    12. Check Plan
+   3. Delete Topic            13. Update Plan
+   4. Display All Topics      14. Delete Plan
+   5. Filter Topics           15. Fill Today's Queue from Plan
+ Today's Study Queue          16. Today's Report
+   6. Add Topics to Queue   Program
+   7. Show Today's Queue      17. Save & Exit
+   8. Study Next Topic
+ Progress
+   9. Progress (Master)
+  10. Progress (Queue)
 ```
 
-Run through every option at least once to sanity-check the full system: add a few topics, search/update/delete one, filter, enqueue a batch by status+priority, display and dequeue the queue, check both progress views, then save & exit and relaunch to confirm the master list persisted (the queue should reset, by design).
+## Data files
+
+| File | Format |
+|---|---|
+| `data/data.txt` | `subject,chapter,priority,is_done,in_plan,completed_on` |
+| `data/queue_data.txt` | `subject,chapter,priority,is_done` |
+| `data/plan_data.txt` | `start_date,end_date,start_totals,base_pace,plan_name` |
 
 ## Roadmap
 
@@ -127,7 +147,10 @@ Run through every option at least once to sanity-check the full system: add a fe
 - [x] File-based persistence
 - [x] Separate study-session priority queue (enqueue/dequeue/display)
 - [x] Progress statistics (master list and queue)
+- [x] Study plan with targets, progress and queue filling
+- [x] Daily report
 - [ ] Subtopic support via a `child` pointer
+- [ ] Show the study plan in the browser frontend
 - [ ] WebAssembly build for a browser-based frontend
 
 ## Tech

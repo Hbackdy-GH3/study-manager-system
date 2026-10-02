@@ -210,3 +210,29 @@ int filter(int* prior, int* stat){
         }
     }
 }
+
+void filter_plan(){
+    if(head==NULL){
+        printf("Data not found!");
+    }
+    Topic* temp=head;
+    while(temp!=NULL){
+        if(temp->in_plan==1){
+            print_topic(temp);
+        }
+        temp=temp->next;
+    }
+}
+
+void filter_plan_via_status(int* n1,int* n2){
+    Topic* temp=head;
+    while(temp!=NULL){
+        if(temp->in_plan == 1){
+            if(temp->is_done==1){
+                (*n1)+=1;
+            }
+            (*n2)+=1;
+        }
+        temp=temp->next;
+    }
+}

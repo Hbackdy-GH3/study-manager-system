@@ -10,6 +10,7 @@ Topic* insert_init(char subject[], char chapter[], int priority, int is_done){
     strcpy(newNode->chapter, chapter);
     newNode->priority=priority;
     newNode->is_done=is_done;
+    newNode->in_plan=0;
     return newNode;
 }
 
@@ -93,13 +94,17 @@ void insert_node_by_priority(Topic* node){
     }
 }
 
-void insert_prior(char subject[], char chapter[], int priority, int is_done){
+Topic* insert_prior(char subject[], char chapter[], int priority, int is_done){
     Topic* newNode=insert_init(subject,chapter,priority,is_done);
+    if (newNode == NULL)
+    {
+        return NULL;            
+    }
     insert_node_by_priority(newNode);
     if(askYN==saveY){
         currMode=save_master;
         save_data();
     }
 
-
+    return newNode;
 }

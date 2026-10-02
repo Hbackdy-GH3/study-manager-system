@@ -7,9 +7,10 @@ Topic* tail=NULL;
 QueueNode* front=NULL;
 QueueNode* back=NULL;
 
+Plan plan;
 
 enum SaveMode currMode=save_master;
-enum when2Save askYN = saveY;
+enum when2save askYN = saveY;
 
 
 int CI(char *a, char *b){
@@ -22,3 +23,6 @@ int CI(char *a, char *b){
     }
     return (*a == '\0' && *b == '\0');
 }
+
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))

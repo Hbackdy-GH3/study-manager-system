@@ -17,39 +17,6 @@ void pop(){
                 popback();
                 break;
             case 3:
-                // if(head==NULL){
-                //     printf("File is empty.\n");
-                //     return;
-                // }
-                // else if(head==tail){
-                //     printf("There is only one topic\n");
-                //     popfront();
-                //     return;
-                // }
-                // Topic* temp=head;
-                // int n=1, choice;
-                // while(temp!=NULL){
-                //     printf("%d. ",n),print_topic(temp);
-                //     temp=temp->next;
-                //     n++;
-                // }
-                // temp=head;
-                // printf("Enter you choice: ");
-                // scanf("%d",&choice);
-                // if(choice==1){
-                //     popfront();
-                //     return;
-                // }
-                // else if(choice==n-1){
-                //     popback();
-                //     return;
-                // }
-                // else if(choice<n-1 && choice>1){
-                //     n=1;
-                //     while(n<choice){
-                //     temp=temp->next;
-                //     n++;
-                // }
                 search_topic();
                 // popany(temp);
                 break;

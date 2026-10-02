@@ -23,18 +23,59 @@ void print_menu(){
     printf("9. Show Progress (Master List)\n");
     printf("10. Show Progress (Today's Queue)\n");
 
+    printf("--- Study Plan ---\n");
+    printf("11. Create Plan\n");
+    printf("12. Check Plan\n");
+    printf("13. Update Plan\n");
+    printf("14. Delete Plan\n");
+    printf("15. Fill Today's Queue from Plan\n");
+
     printf("--- Program ---\n");
-    printf("11. Save & Exit\n");
+    printf("16. Save & Exit\n");
 
     printf("========================================\n");
-    printf("Choose option 1 to 11\n");
+    printf("Choose option 1 to 16\n");
     printf("Enter your choice: ");
 }
 
 
 int main(){
 
+    /* load order matters: master first, queue and plan depend on its topics */
+    currMode = save_master;
     load_data();
+
+    currMode = save_queue;
+    load_data();
+
+    currMode = save_plan;
+    load_data();
+
+    currMode = save_master;     /* back to default */
+
+    /* safety: no plan exists, so no topic should be marked in_plan
+       (happens if the program was closed with Ctrl+C or plan_data.txt was deleted) */
+    if(plan.exists == 0){
+        int changed = 0;
+        Topic* temp = head;
+        while(temp != NULL){
+            if(temp->in_plan == 1){
+                temp->in_plan = 0;
+                changed = 1;
+            }
+            temp = temp->next;
+        }
+        if(changed == 1){
+            currMode = save_master;
+            save_data();
+        }
+    }
+
+    if(plan.exists == 1){
+        printf("\n--- Your Study Plan ---\n");
+        status_plan();
+        printf("\n");
+    }
 
     int choice;
     char subject[50], chapter[50];
@@ -295,13 +336,95 @@ int main(){
                 break;
 
 
-            /* ================= SAVE & EXIT ================= */
+            /* ================= CREATE PLAN ================= */
 
             case 11:
+
+                printf("\nYou selected: Create Plan\n");
+
+                if(head == NULL){
+                    printf("Master list is empty. Add topics first.\n");
+                }
+                else{
+                    creation_plan();
+                }
+
+                printf("\nNow choose your next option from the main menu.\n");
+
+                break;
+
+
+            /* ================= CHECK PLAN ================= */
+
+            case 12:
+
+                printf("\nYou selected: Check Plan\n");
+
+                check_plan();
+
+                printf("\nNow choose your next option from the main menu.\n");
+
+                break;
+
+
+            /* ================= UPDATE PLAN ================= */
+
+            case 13:
+
+                printf("\nYou selected: Update Plan\n");
+
+                update_plan();
+
+                printf("\nNow choose your next option from the main menu.\n");
+
+                break;
+
+
+            /* ================= DELETE PLAN ================= */
+
+            case 14:
+
+                printf("\nYou selected: Delete Plan\n");
+
+                delete_plan();
+
+                printf("\nNow choose your next option from the main menu.\n");
+
+                break;
+
+
+            /* ================= FILL QUEUE FROM PLAN ================= */
+
+            case 15:
+
+                printf("\nYou selected: Fill Today's Queue from Plan\n");
+
+                if(plan.exists == 0){
+                    printf("You have no plan yet. Create one first (option 11).\n");
+                }
+                else{
+                    fill_queue_from_plan();
+                }
+
+                printf("\nNow choose your next option from the main menu.\n");
+
+                break;
+
+
+            /* ================= SAVE & EXIT ================= */
+
+            case 16:
 
                 printf("\nYou selected: Save & Exit\n");
                 printf("Saving all current data...\n");
 
+                currMode = save_master;
+                save_data();
+
+                currMode = save_queue;
+                save_data();
+
+                currMode = save_plan;
                 save_data();
 
                 printf("Data saved successfully.\n");
@@ -315,7 +438,7 @@ int main(){
             default:
 
                 printf("\nInvalid choice.\n");
-                printf("Choose option from 1 to 11 only.\n");
+                printf("Choose option from 1 to 16 only.\n");
 
                 break;
         }

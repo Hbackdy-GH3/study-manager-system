@@ -25,20 +25,31 @@ A console-based study topic manager written in C, built around a **doubly linked
 ## Architecture
 
 ```
-StudyManager/
-├── topic.h            # Topic & QueueNode structs, extern head/tail/front/back, all prototypes
-├── globals.c           # actual definitions of head, tail, front, back
-├── insert.c            # insert_init, insertfront, insertback, insert_any,
-│                        # insert_node_by_priority, insert_prior, remove_node
-├── delete.c            # pop, popfront, popback, popany
-├── search.c             # case-insensitive search (CI), search_topic, searched_action
-├── update.c             # update_priority (with re-sort), update_status
-├── filters.c            # filter_via — pending/completed/priority filters
-├── progress.c            # show_progress, show_progress_queue
-├── queue.c               # filter (for enqueue), enqueue, dequeue, display_queue
-├── file_handling.c        # save_data, load_data
-├── display.c              # print_topic, print_all
-└── main.c                 # interactive menu, program entry point
+Std. management/
+├── include/
+│   └── topic.h              # structs, enums, extern globals, all prototypes
+├── src/
+│   ├── main.c               # interactive menu, program entry point
+│   ├── globals.c            # definitions of head, tail, front, back, plan, modes
+│   ├── core/                # master list (doubly linked list)
+│   │   ├── insert.c         # insert_init, insert_prior, insert_node_by_priority, ...
+│   │   ├── delete.c         # pop, popfront, popback, popany
+│   │   ├── update.c         # update_priority (with re-sort), update_status
+│   │   ├── search.c         # case-insensitive search, searched_action
+│   │   ├── filters.c        # pending/completed/priority filters
+│   │   ├── display.c        # print_topic, print_all
+│   │   └── progress_stat.c  # progress for master list, queue and plan
+│   ├── queue/
+│   │   └── temp_session.c   # today's study queue: enqueue, dequeue, display
+│   ├── plan/                # study plan feature
+│   │   ├── study_plan.c     # create / check / status / update / delete plan
+│   │   ├── operations_plan.c# adding topics to the plan
+│   │   └── date_utils.c     # today_ymd, valid_date, day_number, display_date
+│   └── storage/
+│       └── file_handling.c  # save_data, load_data
+├── data/                    # data.txt, queue_data.txt, plan_data.txt
+├── build/                   # compiled program (not committed)
+└── build.bat                # Windows build script
 ```
 
 ## Data structures
@@ -75,10 +86,16 @@ The master list is a **doubly linked list** so deletion and reinsertion (for pri
 
 ## Build & Run
 
+Always run from the project root folder (the data files are read from `data/`).
+
 ```bash
-gcc *.c -o study_manager
-./study_manager        # Linux/macOS
-.\study_manager.exe    # Windows PowerShell
+# Windows
+build.bat
+.\build\study_manager.exe
+
+# Linux/macOS
+gcc -Iinclude src/*.c src/*/*.c -o build/study_manager
+./build/study_manager
 ```
 
 ## Menu

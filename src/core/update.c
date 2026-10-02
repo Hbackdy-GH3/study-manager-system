@@ -29,3 +29,4 @@ void update_status(Topic* node){
         save_data();
     }
 }
+

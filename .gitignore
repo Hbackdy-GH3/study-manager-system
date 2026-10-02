@@ -1,2 +1,4 @@
-data.txt
-study_manager.exe
+build/*
+!build/.gitkeep
+*.exe
+data/data.txt

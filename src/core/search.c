@@ -59,3 +59,8 @@ void search_topic(){
     printf("Sorry, Data not found!");
 
 }
+
+
+// void search_topic_plan(Topic* node){
+
+// }
